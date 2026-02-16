@@ -1,1 +1,188 @@
 
+Chapter 6 – Replicated Load-Balanced Services
+============================================================
+⭐ KEY QUOTES YOU CAN CITE (ENGLISH)
+============================================================
+
+A replicated load-balanced service consists of a scalable number of identical servers with a load balancer in front of them.
+
+You need at least two replicas to provide a highly available service.
+
+All of this is assuming that your code never fails due to bugs, which is unrealistic in any real-world codebase.
+
+Horizontally scalable systems handle more users by adding more replicas.
+
+A readiness probe determines when an application is ready to serve user requests.
+
+If two users request the same content, only one request goes to the backend; the other is served from memory.
+
+Every page will be stored in every replica, reducing the effective cache size and lowering the hit rate.
+
+Caching can break session tracking.
+
+SSL termination is commonly performed at the edge layer.
+
+
+
+============================================================
+🧠 CONCEPTUAL FRAMEWORK
+============================================================
+
+Single Instance
+    ↓
+Replicas + Load Balancer
+    ↓
+Readiness-aware rollout
+    ↓
+Session strategy
+    ↓
+Caching tier
+    ↓
+Rate limiting / protection
+    ↓
+SSL termination
+
+
+
+============================================================
+📘 CORE UNDERSTANDING (CHINESE EXPLANATION)
+============================================================
+
+1) Replicas + LB = High availability foundation
+通过多副本获得冗余、可扩展、可滚动升级。
+
+2) Stateless is key
+因为请求可以去任何机器，负载均衡才能真正发挥作用。
+
+3) Two replicas minimum
+单机发布、崩溃都会影响 SLA。工程解法是冗余，而不是追求永不失败。
+
+4) Horizontal scaling
+流量上升 → 加副本，而不是升级单机。
+
+5) Readiness vs Liveness
+Liveness 决定是否重启。
+Readiness 决定是否接流量。
+没有 readiness 是大量发布事故的来源。
+
+6) Session affinity
+适用于需要本地缓存或会话状态的场景，但可能导致负载不均。
+consistent hashing 可以减少扩缩容时的扰动。
+
+7) Application-layer LB
+理解 HTTP 后可以加入缓存、限流、安全策略等。
+
+8) Cache tier
+减少重复计算、降低延迟、节约成本。
+但副本多会导致命中率下降，因此通常“少而大”。
+
+9) Rate limiting
+越靠近入口拒绝流量，成本越低。
+
+10) SSL termination
+集中在边缘处理，便于证书管理和降低后端负担。
+
+
+
+============================================================
+🎯 STANDARD INTERVIEW ANSWER TEMPLATE
+============================================================
+
+I would start with stateless replicas behind a load balancer for redundancy and horizontal scaling.
+I would use readiness probes so instances receive traffic only after initialization.
+If needed, I would introduce session affinity, preferably at the application layer.
+To reduce backend load and latency, I would add a caching tier.
+At the edge, I would implement rate limiting and SSL termination to protect internal services.
+
+
+
+============================================================
+🔥 INTERVIEW DEEP DIVE – FOLLOW-UP QUESTIONS
+============================================================
+
+Expect interviewers to go deeper into:
+
+• What happens when readiness fails?
+• How do you perform zero-downtime deployments?
+• When would session affinity hurt more than help?
+• How does cache invalidation work?
+• What metrics determine scaling?
+• What if cache becomes the bottleneck?
+• How do you roll certificates?
+• How do you prevent noisy neighbors?
+• How do you debug uneven load distribution?
+• How would multi-region change the design?
+
+
+
+============================================================
+⚠ MOST COMMON FAILURES AT EACH LAYER
+============================================================
+
+Load Balancer Layer
+- uneven traffic
+- bad health checks
+- retry storms
+
+Replica Layer
+- cold starts
+- resource starvation
+- bad autoscaling thresholds
+
+Readiness
+- marked ready too early
+- dependency not actually reachable
+
+Session
+- hot nodes
+- poor rebalance after scaling
+
+Cache
+- stale data
+- thundering herd
+- memory pressure
+
+Rate Limiting
+- wrong identity key
+- blocking legitimate clients
+
+SSL / Edge
+- certificate expiration
+- misconfigured cipher / handshake latency
+
+
+
+============================================================
+🏦 HEDGE FUND / TRADING INFRA MAPPING
+============================================================
+
+Price API
+→ replicas for compute
+
+Market data snapshot
+→ cache tier to avoid recompute
+
+Client-specific risk views
+→ may require session or shard mapping
+
+Exchange connectivity
+→ readiness critical before routing flow
+
+Market open burst
+→ rate limiting & protection required
+
+Certificate rotation
+→ must be isolated from backend deployment
+
+
+
+============================================================
+🎯 WHAT THIS CHAPTER REALLY TEACHES
+============================================================
+
+Not Kubernetes.
+
+It teaches how to turn a program into an OPERABLE SERVICE:
+scalable, replaceable, resilient, and evolvable.
+
+That is Staff / Principal level thinking.

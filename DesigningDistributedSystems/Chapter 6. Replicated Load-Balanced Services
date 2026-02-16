@@ -85,7 +85,7 @@ consistent hashing 可以减少扩缩容时的扰动。
 
 
 ============================================================
-🎯 STANDARD INTERVIEW ANSWER TEMPLATE
+🎯 TEMPLATE
 ============================================================
 
 I would start with stateless replicas behind a load balancer for redundancy and horizontal scaling.
@@ -115,8 +115,8 @@ Expect interviewers to go deeper into:
 
 
 
-content = """
-Replicated Load-Balanced Services – Deep Dive Interview Answers (Simple English)
+
+Replicated Load-Balanced Services – Deep Dive Thoughts (Simple English)
 
 ============================================================
 1) What happens when readiness fails?

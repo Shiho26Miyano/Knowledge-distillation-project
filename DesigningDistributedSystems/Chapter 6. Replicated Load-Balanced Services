@@ -97,7 +97,7 @@ At the edge, I would implement rate limiting and SSL termination to protect inte
 
 
 ============================================================
-🔥 INTERVIEW DEEP DIVE – FOLLOW-UP QUESTIONS
+🔥 DEEP DIVE – FOLLOW-UP QUESTIONS
 ============================================================
 
 Expect interviewers to go deeper into:
@@ -113,6 +113,141 @@ Expect interviewers to go deeper into:
 • How do you debug uneven load distribution?
 • How would multi-region change the design?
 
+
+
+content = """
+Replicated Load-Balanced Services – Deep Dive Interview Answers (Simple English)
+
+============================================================
+1) What happens when readiness fails?
+============================================================
+If readiness fails, the instance is removed from the load balancer.
+It keeps running, but it stops receiving new traffic.
+Existing connections might continue depending on the system.
+
+Why this matters:
+It prevents traffic from going to a server that is still starting or not fully ready.
+
+
+
+============================================================
+2) How do you perform zero-downtime deployments?
+============================================================
+We run multiple replicas.
+
+During deployment:
+1. Start new instances.
+2. Wait for readiness to pass.
+3. Shift traffic gradually.
+4. Drain old instances.
+
+There are always healthy servers available.
+
+
+
+============================================================
+3) When would session affinity hurt more than help?
+============================================================
+It can create hotspots.
+
+If one heavy user always goes to the same server,
+that server may overload while others are idle.
+
+It also makes scaling harder.
+So if possible, prefer stateless design.
+
+
+
+============================================================
+4) How does cache invalidation work?
+============================================================
+The simplest method is TTL.
+
+After time expires, the next request fetches fresh data.
+
+If stronger correctness is needed,
+we purge or update cache when data changes.
+
+
+
+============================================================
+5) What metrics determine scaling?
+============================================================
+CPU is not enough.
+
+We watch:
+- request rate
+- latency (p95/p99)
+- error rate
+- queue or connection usage
+
+If latency or errors rise, we scale.
+
+
+
+============================================================
+6) What if the cache becomes the bottleneck?
+============================================================
+Then cache must scale too.
+
+We can:
+- add replicas
+- shard the cache
+- bypass cache for some requests
+
+Cache is also a service.
+
+
+
+============================================================
+7) How do you roll certificates?
+============================================================
+Install the new certificate while the old one still works.
+Reload servers gradually.
+When everything uses the new one, remove the old one.
+
+No interruption.
+
+
+
+============================================================
+8) How do you prevent noisy neighbors?
+============================================================
+We enforce limits.
+
+Examples:
+- CPU limits
+- memory limits
+- request limits per client
+
+One user cannot consume everything.
+
+
+
+============================================================
+9) How do you debug uneven load distribution?
+============================================================
+Compare traffic and CPU across instances.
+
+Common reasons:
+- session stickiness
+- long connections
+- bad health checks
+
+Then adjust load balancing.
+
+
+
+============================================================
+10) How would multi-region change the design?
+============================================================
+Now routing and data become complex.
+
+Usually:
+- send users to nearest region
+- replicate data
+
+But consistency and failover must be designed carefully.
 
 
 ============================================================

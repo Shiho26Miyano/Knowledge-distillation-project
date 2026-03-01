@@ -1,0 +1,219 @@
+1) PoC Scope: Pick ONE High-Value Loop (loop A or B or C)
+
+Loop A (Recommended): Incident Debugging → Root Cause Hypotheses
+
+Input:
+- Service
+- Time window
+- Symptoms
+
+Output:
+- Ranked hypotheses
+- Evidence
+- Next queries
+- Suggested fix playbook
+
+This is the cleanest PoC because ROI is obvious: MTTR reduction.
+
+Optional Later Loops:
+Loop B: Proactive optimization recommendations
+Loop C: Auto-create monitors + SLOs
+
+
+2) Minimum Data Surfaces Required
+
+You don’t need perfect observability — only enough to answer:
+What changed? Where? Why?
+
+Required (MVP):
+
+Traces:
+- Service dependency map
+- Spans
+- Latency breakdowns (p95/p99)
+- Error spans
+
+Metrics:
+- Latency
+- Error rate
+- Throughput
+- Saturation (CPU/memory)
+- Queue depth
+
+Logs:
+- Error messages
+- Exceptions within time window
+
+Deploy Events:
+- Deploy timestamp
+- Version/commit
+- Feature flags (if available)
+
+If distributed tracing is unavailable, logs + metrics are sufficient for PoC (though tracing is a force multiplier).
+
+
+3) UX Design: Keep It Simple (1 Page, 3 Outputs)
+
+UI Surface:
+- Internal dashboard OR Slack command
+
+User Inputs:
+- Service name
+- Time window (e.g., last 60 minutes)
+- Symptom (latency spike, error spike, timeouts)
+
+Assistant Returns:
+1) Incident summary (what changed)
+2) Top 3 root-cause hypotheses (ranked with evidence)
+3) Next actions (queries, links, mitigations)
+
+Product-minded without full product overhead.
+
+
+4) Architecture (PoC-Grade, Production-Shaped)
+
+A) Data Access Layer (Tools)
+
+Tools the agent can call:
+
+- query_traces(service, start, end, filters)
+- query_metrics(metric_name, tags, start, end)
+- search_logs(query, start, end)
+- get_deploys(service, start, end)
+- get_service_topology(service, start, end)
+
+Wrap existing systems (Datadog, Splunk, Grafana, ELK, CloudWatch, internal TSDB).
+
+B) Retrieval Layer (Structured RAG)
+
+Store:
+- Historical incidents + root causes + fixes
+- Runbooks/playbooks
+- Common failure patterns (DB pool exhaustion, GC pause, N+1, lock contention, etc.)
+- Service ownership + SLO targets
+
+Retrieve relevant snippets to ground responses.
+
+C) Agent Loop (Bounded Autonomy)
+
+Investigation Plan:
+
+1) Detect symptom pattern
+2) Fetch dependency graph
+3) Compare baseline vs incident window
+4) Identify most changed service/span/endpoint
+5) Correlate logs + deploys
+6) Produce hypotheses with evidence + confidence
+7) Propose next queries and mitigations
+8) Stop (no infinite loops)
+
+D) Guardrails
+
+- Always cite telemetry evidence
+- No confident claims without data
+- Ask for missing data if required
+- Human-in-the-loop (no auto-remediation in PoC)
+
+
+5) What “Agentic” Means in Practice
+
+Mode 1: Developer Assistant
+- User asks questions
+- Agent fetches telemetry and answers
+
+Mode 2: Guided Autonomous Investigation
+- User clicks Investigate
+- Agent runs fixed query sequence
+- Returns structured report
+
+Full remediation autonomy not required for PoC.
+
+
+6) Success Metrics (Define Before Building)
+
+Product Metrics:
+- MTTR reduction
+- Time-to-first-hypothesis
+- Time-to-correct-owner
+- % actionable outputs
+
+Model/System Metrics:
+- Hypothesis precision@3
+- Evidence correctness rate
+- Hallucination rate
+- Incident coverage rate
+
+
+7) Evaluation Plan
+
+Create golden set (30–50 historical incidents):
+
+- Incident description
+- Time window
+- Known root cause
+- Fix action
+- Telemetry artifacts
+
+Score agent output:
+- Correct subsystem identified?
+- Correct change surfaced?
+- Correct next step proposed?
+
+This is how teams move from Prototype → Alpha.
+
+
+8) PoC Deliverables
+
+1) Incident Investigation Report Generator
+   Input: service + time window
+   Output: summary, hypotheses, evidence, next steps
+
+2) Tooling Layer
+   - Trace/metric/log wrappers
+   - Structured JSON outputs
+
+3) Evaluation Framework
+   - Golden set
+   - Scoring script
+   - Regression checks
+
+4) Integration Surface
+   - Slack command OR internal dashboard
+
+
+9) Internal Positioning
+
+Position as:
+- Reliability accelerator
+- On-call copiloting
+- Standardized incident investigation
+- Evidence-backed root cause hypotheses
+
+Not as:
+- LLM chatbot
+
+Anchor to:
+- Reduced MTTR
+- Fewer repeat incidents
+- Better monitor/SLO hygiene
+
+
+10) Phase Ladder: Prototype → Alpha → GA
+
+Prototype:
+- 1–2 services
+- 10 incidents
+- Manual execution (script/notebook acceptable)
+
+Alpha:
+- 5–10 services
+- 30–50 incident golden set
+- Slack/UI integration
+- Basic safety + guardrails
+
+GA:
+- On-call supported
+- Monitoring + SLA
+- Security review + audit logs
+- Multi-tenant safe
+- Model change management + regression evaluation

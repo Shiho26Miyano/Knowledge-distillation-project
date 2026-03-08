@@ -1,0 +1,116 @@
+SYSTEM DESIGN SUMMARY
+
+PART 1 — Backend & Distributed Systems
+
+Design URL Shortener
+Tests unique ID generation, high read scalability, key-value storage, and redirect latency optimization.
+
+Design Twitter / X
+Tests massive social graph handling, feed generation models, high read/write scalability, and hot user mitigation.
+
+Design Uber
+Tests real-time geo-location streaming, nearest-neighbor matching, and high-concurrency state synchronization.
+
+Design WhatsApp / Messenger
+Tests low-latency message delivery, online/offline handling, persistence, and multi-device synchronization.
+
+Design News Feed
+Tests feed generation strategies, push vs pull tradeoffs, and caching hot content.
+
+Design YouTube / Video Platform
+Tests large file storage, video processing pipelines, CDN distribution, and streaming latency control.
+
+Design Rate Limiter
+Tests distributed counters, rate limiting algorithms, and precision vs performance tradeoffs.
+
+Design Distributed Cache
+Tests hot data caching, eviction policies, cache consistency, and sharding strategies.
+
+Design API Gateway
+Tests unified routing, authentication, rate limiting, monitoring, and service aggregation.
+
+Design Notification System
+Tests asynchronous processing, reliable delivery, retries, deduplication, and multi-channel messaging.
+
+PART 2 — Infrastructure / Platform Systems
+
+Design Logging System
+Tests high-throughput ingestion, distributed storage, indexing, and efficient search.
+
+Design Metrics / Telemetry Platform
+Tests time-series ingestion, aggregation pipelines, compression, and fast queries.
+
+Design File Storage System
+Tests file chunking, replication, redundancy, metadata management, and high availability.
+
+Design Search Engine
+Tests inverted index construction, fast retrieval, ranking systems, and incremental indexing.
+
+Design Job Scheduler
+Tests task scheduling, dependency graphs, retry mechanisms, and distributed coordination.
+
+Design Message Queue
+Tests message durability, ordering guarantees, consumer scaling, and backpressure handling.
+
+Design Feature Flag System
+Tests real-time configuration rollout, consistency across services, and staged deployments.
+
+Design Payment System
+Tests strong consistency, idempotency, transaction integrity, reconciliation, and reliability.
+
+PART 3 — Data / Realtime / Streaming Systems
+
+Design Chat System
+Tests real-time messaging protocols, session state management, and persistent storage.
+
+Design Live Streaming Platform
+Tests high-bandwidth video pipelines, ultra-low latency delivery, and massive audience scaling.
+
+Design Stock Trading Platform
+Tests ultra-low latency processing, strong consistency, order matching, and fault tolerance.
+
+Design Real-Time Bidding System
+Tests millisecond decision systems, high-throughput auctions, and real-time analytics.
+
+Design Distributed Lock Service
+Tests distributed mutual exclusion, fault recovery, lease expiration, and consensus mechanisms.
+
+PART 4 — Core Engineering Concepts
+
+Scalability
+Horizontal scaling, load balancing, partitioning, sharding, hotspot mitigation.
+
+High Availability & Reliability
+Replication, failover, redundancy, fault tolerance, disaster recovery.
+
+Consistency & Distributed Tradeoffs
+CAP theorem, strong vs eventual consistency, quorum systems, distributed transactions.
+
+Performance Engineering
+Latency reduction, throughput optimization, caching, asynchronous processing.
+
+Storage & Data Modeling
+SQL vs NoSQL tradeoffs, indexing strategies, schema design, partition keys.
+
+Messaging & Async Systems
+Message queues, event-driven architectures, delivery guarantees, backpressure.
+
+Caching Strategies
+Cache-aside, write-through, write-back, invalidation strategies, CDN usage.
+
+Traffic Management
+Rate limiting, throttling, circuit breakers, API gateways.
+
+Distributed Coordination
+Leader election, heartbeats, consensus basics, distributed locks.
+
+Observability & Operations
+Logging, metrics, tracing, monitoring, alerting.
+
+PART 5 — What Interviewers Evaluate
+
+Structured problem solving
+Clear architecture design
+Understanding of tradeoffs
+Scalability thinking
+Engineering practicality

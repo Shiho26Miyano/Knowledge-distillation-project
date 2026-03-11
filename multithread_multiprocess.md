@@ -1,3 +1,5 @@
+# Multithreading vs Multiprocessing
+
 ## The Core Concept
 
 A **process** is an independent program with its own memory space. A **thread** is a lightweight unit of execution *within* a process — threads share memory with each other.

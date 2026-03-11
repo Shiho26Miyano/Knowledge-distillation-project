@@ -1,0 +1,27 @@
+Layer 1 初筛 — Snapshot API（REST）
+用 Massiv REST API，不用 WebSocket。
+GET /v2/snapshot/locale/us/markets/stocks/tickers
+原因：
+一次性扫全市场所有股票的当前价格、成交量、市值
+Snapshot 是专门为这个设计的，一个请求返回全市场数据
+WebSocket 是推送单只股票的实时 tick，不适合做批量扫描
+
+迷你走势图 — Aggregates API（REST）
+也是 REST，不用 WebSocket。
+GET /v2/aggs/ticker/{ticker}/range/1/day/{from}/{to}
+原因：
+走势图需要的是历史 OHLCV，是静态数据
+用户点击某只股票才触发，按需加载
+WebSocket 只推实时数据，历史数据必须用 REST 拉
+
+
+实时价格（如果想加）— WebSocket
+这里才用 WebSocket。
+wss://delayed.polygon.io/stocks  ← Massiv 应该有类似端点
+订阅：{"action":"subscribe","params":"T.AAPL"}
+适合场景：
+筛选结果表格里的价格自动刷新
+用户盯着某只股票看，价格实时跳动
+Massive 是 15min delay，所以 WebSocket 推过来的也是延迟数据，不是真正的实时。用 WebSocket 还是 15 分钟轮询 REST，效果其实差不多。
+
+

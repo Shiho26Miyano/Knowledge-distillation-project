@@ -1,0 +1,108 @@
+## The Core Concept
+
+A **process** is an independent program with its own memory space. A **thread** is a lightweight unit of execution *within* a process — threads share memory with each other.
+
+---
+
+## CPU-Bound vs I/O-Bound Tasks
+
+| | CPU-Bound | I/O-Bound |
+|---|---|---|
+| **Bottleneck** | Processor speed | Waiting (disk, network, DB) |
+| **Example** | Matrix math, compression, ML training | Web requests, file reads, DB queries |
+| **CPU usage** | Always high | Low — CPU sits idle while waiting |
+
+---
+
+## What Happens at the OS Level
+
+### Threads — Shared Memory, One GIL (in Python)
+
+```
+Process A
+├── Thread 1 ──► OS Scheduler ──► CPU Core 1
+├── Thread 2 ──► OS Scheduler ──► CPU Core 1  ← same core! (Python GIL)
+└── Thread 3 ──► OS Scheduler ──► CPU Core 1
+     └── Shared heap memory (all threads see the same data)
+```
+
+- The OS schedules threads via **context switching** — rapidly pausing one thread and resuming another
+- In Python, the **GIL (Global Interpreter Lock)** prevents true parallel execution of Python bytecode → only one thread runs at a time
+- BUT: the GIL is **released during I/O waits**, so threads still shine for I/O-bound work
+
+### Processes — Isolated Memory, True Parallelism
+
+```
+Process A ──► CPU Core 1   (own memory space)
+Process B ──► CPU Core 2   (own memory space)
+Process C ──► CPU Core 3   (own memory space)
+     └── No shared memory — must use IPC (pipes, queues, shared memory)
+```
+
+- Each process gets its **own GIL** → true parallel CPU execution
+- OS treats each as independent — separate PID, memory, file descriptors
+- Heavier to spawn (fork/exec), higher memory cost
+
+---
+
+## OS Scheduling: How the CPU Actually Decides
+
+The OS kernel uses a **scheduler** to allocate CPU time:
+
+1. **Running** → actively on CPU
+2. **Ready** → waiting for CPU time
+3. **Blocked** → waiting for I/O (disk, network) — *removed from queue entirely*
+
+```
+Thread/Process lifecycle:
+
+  [Ready] ──► [Running] ──► [Blocked by I/O]
+     ▲             │               │
+     │    time     │    I/O done   │
+     └─ preempted ─┘◄──────────────┘
+```
+
+When a thread is **blocked on I/O**, the OS pulls it off the CPU and runs something else — this is why threading helps I/O-bound tasks even without true parallelism.
+
+---
+
+## Decision Guide
+
+```
+Is your task CPU-heavy (number crunching)?
+    YES → multiprocessing  (bypass GIL, use all cores)
+    NO  → Is it I/O-heavy (network, disk, DB)?
+              YES → multithreading or async/await
+              NO  → single thread is probably fine
+```
+
+### Python Quick Reference
+
+```python
+# I/O-bound → threading
+from concurrent.futures import ThreadPoolExecutor
+with ThreadPoolExecutor(max_workers=8) as ex:
+    results = list(ex.map(fetch_url, urls))
+
+# CPU-bound → multiprocessing
+from concurrent.futures import ProcessPoolExecutor
+with ProcessPoolExecutor(max_workers=4) as ex:
+    results = list(ex.map(crunch_numbers, data_chunks))
+```
+
+---
+
+## Summary Table
+
+| | Multithreading | Multiprocessing |
+|---|---|---|
+| **Memory** | Shared | Isolated |
+| **Parallelism (Python)** | ❌ (GIL) | ✅ True parallel |
+| **Best for** | I/O-bound | CPU-bound |
+| **Overhead** | Low | Higher (fork cost) |
+| **Communication** | Easy (shared vars) | Harder (queues/pipes) |
+| **Crash isolation** | ❌ One thread can corrupt all | ✅ Processes are isolated |
+
+---
+
+> **Key mental model:** threads wait together, processes work in parallel. The OS is always the one deciding who gets CPU time — your job is to structure the work so the OS can keep all cores busy.
